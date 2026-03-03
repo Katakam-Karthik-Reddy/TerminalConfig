@@ -1,27 +1,25 @@
+# set the home of zinit package manager
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
+# install if zinit is installed yet
 if [ ! -d "$ZINIT_HOME" ]; then
     mkdir -p "$(dirname $ZINIT_HOME)"
     git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 fi
 
+export PATH="$PATH:/home/astra-server/.local/bin:$HOME/.local/share/bob/nightly/bin:$HOME/.cargo/bin:$HOME/.fzf/bin:$HOME/.local/bin:$HOME/.cargo/bin"
 
+
+# source the zinit after installing it
 source "${ZINIT_HOME}/zinit.zsh"
-PS1="kkr@termux: \w $ "
+autoload -U colors && colors
 
-zinit ice depth=1
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light Aloxaf/fzf-tab
-zinit light jeffreytse/zsh-vi-mode
 
-autoload -U compinit && compinit
+# prompt format
+PROMPT="%F{#F7BC85}%n@%m: %~%f
+=> "
 
-bindkey -v
-bindkey '^r' fzf-history-widget
-
-HISTSIZE=5000
+HISTSIZE=100000
 HISTFILE=~/.zsh_history
 SAVEHIST=$HISTSIZE
 HISTDUP=erase
@@ -33,25 +31,48 @@ setopt hist_save_no_dups
 setopt hist_find_no_dups
 setopt re_match_pcre
 
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+alias ls="ls --color -la"
+alias fd="fdfind"
+alias cc="clear"
+alias nv="nvim"
+alias tm="tmux"
+alias ta="tmux attach"
+alias tl="tmux last-window"
+alias bat='batcat --color=always --style=numbers {} | fzf --preview'
+alias cdd="cd /mnt/d/"
+mann() {
+    "man $1"
+}
+# mann() {
+#     man "$1" | fzf --preview "batcat --color=always --style=number {}"
+# }
+
+autoload -U compinit && compinit
+
+zinit ice depth=1
+zinit light Aloxaf/fzf-tab
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+zinit light jeffreytse/zsh-vi-mode
+
+
+bindkey -v  # enabling the vim mode
+bindkey '^r' fzf-history-widget # history with fzf
+
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # to get completion irrespective to case
+# zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # make the
 zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
-alias ls-'ls --color'
-alias cc=clear
-alias nv=nvim
-alias tm=tmux
-alias tl=tmux last-window
 
 
 eval "$(fzf --zsh)"
-eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/omp.toml)"
 
 # Only changing the escape key to `jk` in insert mode, we still
 # keep using the default keybindings `^[` in other modes
-# ZVM_VI_INSERT_ESCAPE_BINDKEY=
+# ZVM_VI_INSERT_ESCAPE_BINDKEY=lk
 # Append a command directly
 zvm_after_init_commands+=('[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh')
 ZVM_SYSTEM_CLIPBOARD_ENABLED=true
@@ -60,3 +81,4 @@ ZVM_SYSTEM_CLIPBOARD_ENABLED=true
 # ZVM_SYSTEM_CLIPBOARD_ENABLED=true
 # ZVM_CLIPBOARD_COPY_CMD='clip.exe'
 # ZVM_CLIPBOARD_PASTE_CMD='powershell.exe -NoProfile -Command Get-Clipboard'
+
